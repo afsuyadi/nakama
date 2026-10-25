@@ -50,6 +50,7 @@ import {
 import {
   createContext,
   type ReactNode,
+  type RefObject,
   useCallback,
   useContext,
   useEffect,
@@ -1118,7 +1119,7 @@ function ChatComposerTextarea({
   );
 
   const { prefix, setPrefix } = useContext(CommandPrefixContext);
-  const { promptHistoryRef, historyPointer, setHistory } =
+  const { promptHistoryRef, historyPointer, setHistoryPointer } =
     useContext(PromptHistoryContext);
   const value = controller.textInput.value;
   const setInput = controller.textInput.setInput;
@@ -1155,6 +1156,10 @@ function ChatComposerTextarea({
         disabled={disabled}
         longPasteWordThreshold={longPasteWordThreshold}
         onChange={(event) => {
+          if (historyPointer !== null) {
+            setHistoryPointer(null);
+          }
+
           updateSlashRange(
             event.currentTarget.value,
             event.currentTarget.selectionStart
@@ -1176,6 +1181,38 @@ function ChatComposerTextarea({
             if (event.key === "Escape" && prefix) {
               event.preventDefault();
               setPrefix(null);
+            }
+            if (
+              event.currentTarget.selectionStart === 0 &&
+              event.currentTarget.selectionEnd === 0
+            ) {
+              if (event.key === "ArrowUp") {
+                if (promptHistoryRef.current.length === 0) {
+                  return;
+                }
+
+                const nextPointer =
+                  historyPointer === null
+                    ? promptHistoryRef.current.length - 1
+                    : Math.max(historyPointer - 1, 0);
+
+                event.preventDefault();
+                setHistoryPointer(nextPointer);
+                setInput(promptHistoryRef.current[nextPointer]);
+              }
+
+              if (event.key === "ArrowDown" && historyPointer !== null) {
+                event.preventDefault();
+
+                if (historyPointer >= promptHistoryRef.current.length - 1) {
+                  setHistoryPointer(null);
+                  setInput("");
+                } else {
+                  const nextPointer = historyPointer + 1;
+                  setHistoryPointer(nextPointer);
+                  setInput(promptHistoryRef.current[nextPointer]);
+                }
+              }
             }
 
             return;
