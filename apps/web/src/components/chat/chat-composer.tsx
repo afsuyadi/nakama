@@ -153,6 +153,11 @@ interface ChatComposerBaseProps {
   onStop?: () => void;
   onSubmit: (text: string, files: FileUIPart[]) => void;
   placeholder?: string;
+  /**
+   * Owned by the caller so it survives the composer remounting when the
+   * first send in a new chat changes `session` from null to a real id.
+   */
+  promptHistoryRef?: RefObject<string[]>;
   queuedMessages?: QueuedComposerMessage[];
   todos?: AgentTodo[];
 }
@@ -783,11 +788,12 @@ function useOpenPluginContext(profileId: string | null) {
 export function ChatComposer(props: ChatComposerProps) {
   const { activeOrg, updateOrg, user } = useAuth();
   const { textInput } = usePromptInputController();
-  const promptHistoryRef = useRef<string[]>([]);
+  const ownPromptHistoryRef = useRef<string[]>([]);
+  const promptHistoryRef = props.promptHistoryRef ?? ownPromptHistoryRef;
   const [historyPointer, setHistoryPointer] = useState<number | null>(null);
   const promptHistoryContext = useMemo(
     () => ({ historyPointer, promptHistoryRef, setHistoryPointer }),
-    [historyPointer]
+    [historyPointer, promptHistoryRef]
   );
   const [addDialog, setAddDialog] = useState<ComposerAddCommandAction | null>(
     null
