@@ -93,6 +93,7 @@ async function typeText(textarea: HTMLTextAreaElement, text: string) {
 
 async function submit(container: HTMLElement, textarea: HTMLTextAreaElement) {
   await typeText(textarea, textarea.value);
+
   const sendButton = container.querySelector<HTMLElement>(
     'button[aria-label="Send message"]'
   );
@@ -102,6 +103,7 @@ async function submit(container: HTMLElement, textarea: HTMLTextAreaElement) {
 
 function caretUp(textarea: HTMLTextAreaElement) {
   textarea.setSelectionRange(0, 0);
+
   const event = new KeyboardEvent("keydown", {
     bubbles: true,
     cancelable: true,
@@ -115,6 +117,7 @@ function caretUp(textarea: HTMLTextAreaElement) {
 
 function caretDown(textarea: HTMLTextAreaElement) {
   textarea.setSelectionRange(0, 0);
+
   const event = new KeyboardEvent("keydown", {
     bubbles: true,
     cancelable: true,
@@ -128,6 +131,7 @@ function caretDown(textarea: HTMLTextAreaElement) {
 
 test("ArrowUp recalls the most recently sent prompt", async () => {
   const sent: string[] = [];
+
   const { container, textarea } = await renderComposer((text) =>
     sent.push(text)
   );

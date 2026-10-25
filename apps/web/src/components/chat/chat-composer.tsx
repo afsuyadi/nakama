@@ -703,6 +703,7 @@ const ConnectorsContext = createContext<{
 
 /** True when `/btw` is offered: only the composer that can open a side chat. */
 const BtwCommandContext = createContext(false);
+
 const PromptHistoryContext = createContext<{
   promptHistoryRef: RefObject<string[]>;
   historyPointer: number | null;
@@ -712,6 +713,7 @@ const PromptHistoryContext = createContext<{
   promptHistoryRef: { current: [] },
   setHistoryPointer: () => undefined,
 });
+
 const CommandPrefixContext = createContext<{
   prefix: string | null;
   setPrefix: (prefix: string | null) => void;
@@ -791,10 +793,12 @@ export function ChatComposer(props: ChatComposerProps) {
   const ownPromptHistoryRef = useRef<string[]>([]);
   const promptHistoryRef = props.promptHistoryRef ?? ownPromptHistoryRef;
   const [historyPointer, setHistoryPointer] = useState<number | null>(null);
+
   const promptHistoryContext = useMemo(
     () => ({ historyPointer, promptHistoryRef, setHistoryPointer }),
     [historyPointer, promptHistoryRef]
   );
+
   const [addDialog, setAddDialog] = useState<ComposerAddCommandAction | null>(
     null
   );
@@ -891,6 +895,7 @@ export function ChatComposer(props: ChatComposerProps) {
 
         return;
       }
+
       promptHistoryRef.current.push(text);
       setHistoryPointer(null);
       clearDraft();
@@ -1125,8 +1130,10 @@ function ChatComposerTextarea({
   );
 
   const { prefix, setPrefix } = useContext(CommandPrefixContext);
+
   const { promptHistoryRef, historyPointer, setHistoryPointer } =
     useContext(PromptHistoryContext);
+
   const value = controller.textInput.value;
   const setInput = controller.textInput.setInput;
 
@@ -1188,6 +1195,7 @@ function ChatComposerTextarea({
               event.preventDefault();
               setPrefix(null);
             }
+
             if (
               event.currentTarget.selectionStart === 0 &&
               event.currentTarget.selectionEnd === 0
